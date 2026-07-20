@@ -1,0 +1,6 @@
+{
+  "name": "workerhelper",
+  "version": "1.0.0",
+  "type": "module",
+  "main": ".opencode/plugins/workerhelper.js"
+}

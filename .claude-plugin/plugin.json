@@ -1,0 +1,10 @@
+{
+  "name": "workerhelper",
+  "description": "WorkerHelper: a doc-driven AI coding workflow skill suite — locate code via feature route maps and route execution by task scale (worker-lookup / design / plan / exec-plan / worker-sync).",
+  "version": "1.0.0",
+  "author": { "name": "IcarusZy", "url": "https://github.com/IcarusZy" },
+  "homepage": "https://github.com/IcarusZy/workerhelper",
+  "repository": "https://github.com/IcarusZy/workerhelper",
+  "license": "MIT",
+  "keywords": ["skills", "workflow", "route-map", "spec-driven", "opencode", "claude-code", "codex"]
+}

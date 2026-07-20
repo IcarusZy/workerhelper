@@ -1,0 +1,26 @@
+{
+  "name": "workerhelper",
+  "version": "1.0.0",
+  "description": "WorkerHelper: a doc-driven AI coding workflow skill suite — locate code via feature route maps and route execution by task scale.",
+  "author": { "name": "IcarusZy", "url": "https://github.com/IcarusZy" },
+  "homepage": "https://github.com/IcarusZy/workerhelper",
+  "repository": "https://github.com/IcarusZy/workerhelper",
+  "license": "MIT",
+  "keywords": ["skills", "workflow", "route-map", "spec-driven", "worker-lookup", "exec-plan"],
+  "skills": "./skills/",
+  "hooks": {},
+  "interface": {
+    "displayName": "WorkerHelper",
+    "shortDescription": "Doc-driven AI coding workflow: locate code via route maps, route by task scale",
+    "longDescription": "WorkerHelper guides agent work through worker-lookup (code location via feature route map), design, plan, exec-plan, worker-debug, and worker-sync — scaling workflow depth by task size.",
+    "developerName": "IcarusZy",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "Help me find where this feature is implemented.",
+      "Let's add a feature to this project."
+    ],
+    "websiteURL": "https://github.com/IcarusZy/workerhelper",
+    "brandColor": "#3B82F6"
+  }
+}
