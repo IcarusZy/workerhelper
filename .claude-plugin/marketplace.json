@@ -1,0 +1,20 @@
+{
+  "name": "workerhelper-marketplace",
+  "description": "Marketplace for the WorkerHelper plugin — doc-driven AI coding workflow",
+  "owner": {
+    "name": "IcarusZy",
+    "url": "https://github.com/IcarusZy"
+  },
+  "plugins": [
+    {
+      "name": "workerhelper",
+      "description": "Doc-driven AI coding workflow: locate code via feature route maps, route execution by task scale.",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "IcarusZy",
+        "url": "https://github.com/IcarusZy"
+      }
+    }
+  ]
+}

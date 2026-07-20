@@ -16,27 +16,36 @@ Supported harnesses: **OpenCode**, **Claude Code**, **Codex**. The same `skills/
 
 ## Install
 
+Pick your harness — the same `skills/` run on all three; only the bootstrap differs.
+
+### Claude Code
+
+Standard marketplace install:
+
+```
+/plugin marketplace add IcarusZy/workerhelper
+/plugin install workerhelper@workerhelper-marketplace
+```
+
+The SessionStart hook auto-injects `using-workerhelper` on every session start (including after `/clear` and compaction).
+
+For local development, you can instead `/plugin install /absolute/path/to/workerhelper`.
+
 ### OpenCode
 
-See [`.opencode/INSTALL.md`](.opencode/INSTALL.md). In short, add to `opencode.json`:
+Add to `opencode.json` (global or project-level), then restart OpenCode:
 
 ```json
 { "plugin": ["workerhelper@git+https://github.com/IcarusZy/workerhelper.git"] }
 ```
 
-### Claude Code
-
-Install from a local checkout. The `.claude-plugin/plugin.json` + `hooks/hooks.json` SessionStart hook auto-inject `using-workerhelper` on every session start (including after `/clear` and compaction):
-
-```
-/plugin install /absolute/path/to/workerhelper
-```
-
-For marketplace distribution later, add a `.claude-plugin/marketplace.json` and register with `/plugin marketplace add IcarusZy/workerhelper`.
+Details: [`.opencode/INSTALL.md`](.opencode/INSTALL.md).
 
 ### Codex
 
-Install via the Codex plugin flow — `.codex-plugin/plugin.json` declares the skills (Codex discovers them natively; no session hook). For `exec-plan` sub-agents, enable multi-agent in `~/.codex/config.toml`:
+Install via Codex's plugin flow — point Codex at this repo as a marketplace source, then in the Codex CLI run `/plugins`, search `workerhelper`, and install. The `.codex-plugin/plugin.json` declares the skills; Codex discovers them natively (no session hook). Installed plugins are cached under `~/.codex/plugins/cache/`.
+
+For `exec-plan` sub-agents, enable multi-agent in `~/.codex/config.toml`:
 
 ```toml
 [features]
