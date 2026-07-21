@@ -1,5 +1,7 @@
 # WorkerHelper
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 A doc-driven AI coding workflow skill suite for individual developers. It standardizes task execution **by task scale** and quickly locates feature code through **feature route maps**.
 
 Supported harnesses: **OpenCode**, **Claude Code**, **Codex**. The same `skills/` run on all three — only the bootstrap/activation mechanism differs per harness.
