@@ -1,115 +1,144 @@
 ---
 name: worker-init
-description: Create the feature route map for the first time, define the format template, and write initial entries. Only triggered when the feature route map does not exist and the current task requires code location.
+description: Create the feature route map for the first time and write initial entries. Only triggered when the route map does not exist and the current task requires code location.
 ---
 
 # Route Init
 
-Create the feature route map for the first time, define the format template, and write initial entries.
+Create the feature route map for the first time: a full-project inventory (user-guided on which modules matter), organized as a feature→file lookup — single file for small projects, or a master index + per-module files for large ones (progressive disclosure, token-efficient).
 
 ## Core Principles
 
-- Only perform initial setup when the route map does not exist.
-- Conduct targeted code scanning based on the current task; only record features directly related to the current task — do not perform a full repository inventory.
-- Only write feature location entries when the current task can be associated with clear features, entry points, or core code; if feature names or entry points cannot be confirmed, mark fields as `uncertain`.
-- If the current task is not suitable for generating the first feature entry (e.g., typos, formatting, dependency upgrades, pure documentation), only create the base template and explain the reason — do not force low-quality entries.
-- The feature route map is not a complete index or feature knowledge base; it only records the most valuable locations to read first when modifying a feature next time.
-- Information that cannot be confirmed should be written as `uncertain` or simply omitted — never fabricate.
+- **First time = full inventory; daily maintenance is incremental.** First-time creation scans the whole project to build a complete baseline. Subsequent updates go through `worker-sync`, not re-init.
+- **Scan broad, record lean.** Identify every feature across the project, but each entry records only what is needed to locate code next time (entry / core / tests / necessary notes). The map is a "what to read first" lookup — NOT a full code index or knowledge base.
+- **Let the user steer depth.** Ask which modules are CORE (inventory deeply) vs LEGACY/ABANDONED (skip or cover lightly), so dead code does not waste effort or pollute the map.
+- **Feature = a capability, not a module.** One feature = one thing a future change would target (e.g., "user login", "Agent creation and run"). Modules are the optional grouping layer ABOVE features.
+- **Ground every entry in real code.** Read the files before recording; unconfirmed locations are marked `uncertain` or omitted — never fabricated.
+- **Do not force low-quality entries.** If the current task is a non-feature (typos, formatting, dependency upgrade, pure docs), still create the base map and explain — do not pad it with noise.
 
 ## Route Map Location
 
-- By default, create `docs/workerhelper/feature-routes.md` using the hierarchical structure of "Project Overview → Module Index → Module → Feature".
-- For medium-to-large projects, projects with clear business modules, or projects expected to have rapidly growing feature entries, prefer the `docs/workerhelper/feature-routes/` directory mode; for small projects or when only a few entries are needed, use the single-file mode.
-- In directory mode, use kebab-case filenames by module by default, e.g., `docs/workerhelper/feature-routes/user-auth.md`; feature-level files are only allowed when the index explicitly maintains a "feature name → route file" mapping.
-- Directory mode must maintain a lightweight index: `docs/workerhelper/feature-routes/README.md` or `docs/workerhelper/feature-routes/index.md`, recording the "module name → route file" mapping; when using feature-level files, a "feature name → route file" mapping must also be added for lookup to locate specific files first.
+Choose the structure by realistic projected size, not just today's count:
+
+- **Single file** — `docs/workerhelper/feature-routes.md`. Use when there are ≈30 features or fewer, or the whole map stays under ~200 lines.
+- **Directory mode** — `docs/workerhelper/feature-routes/` with a master index plus one file per module. Use for larger or multi-module projects. This is **progressive disclosure**: the AI reads the cheap index first, then only the one module file it needs — saving tokens. Migration from single-file → directory later is cheap, but start in directory mode if the project clearly has multiple distinct business modules.
+
+In directory mode:
+
+- `feature-routes/index.md` — master index: module → file + one-line module summary + feature count.
+- `feature-routes/<module>.md` — one file per module, kebab-case (e.g., `user-auth.md`), holding that module's feature entries.
 
 ## Workflow
 
-1. Confirm that the route map does not exist: check `docs/workerhelper/feature-routes.md` or `docs/workerhelper/feature-routes/`.
-2. Conduct targeted code scanning based on the current task, prioritizing source code, entry points, configuration, and test directories; exclude dependencies, build artifacts, caches, and generated code.
-3. Create the route map file using the initial setup template; small projects default to `docs/workerhelper/feature-routes.md`, while medium-to-large projects or projects with clear modules prefer the directory mode.
-4. If using directory mode, first create the feature index file, then create the specific module file matching the current task.
-5. When the current task can be associated with clear features, entry points, or core code, write at least one feature location entry; when not suitable for generating entries, only keep the base template and explain the reason.
-6. After initialization is complete, return to `worker-lookup` to continue the lookup process, marking the coverage status as `partial`.
+1. Confirm the route map does not exist: check `docs/workerhelper/feature-routes.md` and `docs/workerhelper/feature-routes/`.
+2. Full-project scan to identify modules and features. Follow **Scan Priority** below — do not open every file.
+3. Ask the user ONE consolidated question: which modules are CORE (inventory deeply) vs LEGACY/ABANDONED (skip or cover lightly). Proceed even if the user has no preference.
+4. Decide structure by size (single file vs directory mode).
+5. Write the Project Overview (type, main entry, core directories, global test entry).
+6. Write feature entries — grouped by module, or flat under a `## Features` heading for small projects. For each feature record Description + Entry + Core (+ Tests when non-obvious; + feature-specific extra location fields only when they affect locating). See **Feature Entry Fields**.
+7. Mark unconfirmed locations `uncertain`; never fabricate.
+8. Return to `worker-lookup` and set coverage to `partial` (the map now exists; worker-lookup refines per task).
 
-## Initial Setup Template
+## Scan Priority
+
+Read in this order; exclude the rest:
+
+- **Do read:** entry points, config/manifests, routing and module-registration files, source directories, test directories.
+- **Do not read:** dependencies (`node_modules/`, `vendor/`, `.venv/`), build artifacts (`dist/`, `build/`, `target/`), caches, generated code, lockfiles, `.git/`.
+- Enumerate with glob/grep first; open only the entry/core file(s) per feature — not every file.
+
+## Feature Entry Fields
+
+- **Feature name** — a capability a future change would target, verb-object style (e.g., "Agent creation and run", "User login"). NOT a module name.
+- **Description** (说明) — 1–2 sentences: what the feature does, naming the key file/function it revolves around. Keep tight; put file references mainly in Entry/Core.
+- **Entry** (入口) — the request/call entry point: API route, page, command, or top-level function (e.g., `src/agent/runner_wrapper.py :: run_agent`).
+- **Core** (核心) — the file(s) to read first to understand or change this feature (business logic, orchestration, data/state).
+- **Tests** (测试) — verification location; omit when obvious from the global Test entry.
+- **Extra location fields** (e.g., 提示词备份 / prompts backup) — feature-specific locations added ONLY when they affect locating; never forced on every feature.
+
+Unconfirmed → `uncertain` or omit. Field names may be localized to your project's language (入口/核心/测试) as long as the meaning stays consistent. Missing fields are omitted without forcing `N/A`.
+
+Example entry (multi-file cells are comma-separated):
+
+```md
+### Agent creation and run
+- Description: All LLM requests are wrapped as agent calls. `agent_factory.py` builds the Agent; `runner_wrapper.py` runs it. Single-call entry `run_agent`, batch `run_agent_batch`; prompt selected via `agent_code`.
+- Entry: `src/agent/runner_wrapper.py` :: `run_agent`, `run_agent_batch`
+- Core: `src/agent/agent_factory.py`, `src/agent/runner_wrapper.py`
+- Prompts backup: `docs/prompts/` (DB is source of truth; code references via `agent_code`)
+```
+
+## Templates
+
+### Single-file route map (small project)
+
+Flat layout — features directly under `## Features`:
 
 ```md
 # Feature Route Map
 
 ## Project Overview
-
-- Application type: ...
+- Type: ...
 - Main entry: `...`
 - Core directories: `...`
 - Test entry: `...`
 
-## Module Index
-
-- {Module name}: {Feature name}, {Feature name}
-
-## {Module name}
+## Features
 
 ### {Feature name}
-
 - Description: ...
 - Entry: `...`
 - Core: `...`
 - Tests: `...`
-- Notes: ...
+- {Extra}: `...`
 ```
 
-During initial setup, even if only a small amount of information can be confirmed, the hierarchical structure can be retained; missing fields can be omitted without forcing `N/A`.
+If the small project has several distinct modules, replace `## Features` with one `## {Module}` heading per module, each containing `### {Feature}` entries.
 
-## Feature Location Entry
-
-Each feature only retains information that helps locate code:
-
-- Parent module.
-- Feature name.
-- One-line description.
-- User entry, external entry, page, API, command, or task entry point.
-- Core code location; business orchestration, data, state, or persistence locations are only written in core or notes when they affect the next location lookup.
-- Related test or verification locations.
-- Necessary notes.
-
-Feature location entries only contain information that helps locate code. Extended information such as status, type, change history, platform differences, observability/debugging, or related features should be merged into a single note only when it actually affects location lookup.
-
-## New Module Template
-
-```md
-## {Module name}
-
-### {Feature name}
-
-- Description: ...
-- Entry: `...`
-- Core: `...`
-- Tests: `...`
-- Notes: ...
-```
-
-## New Entry Template
-
-```md
-### {Feature name}
-
-- Description: ...
-- Entry: `...`
-- Core: `...`
-- Tests: `...`
-- Notes: ...
-```
-
-Missing fields can be omitted without forcing `N/A`. If the project already has more specific field naming, the existing naming can be continued, but the "module → feature" hierarchy must be preserved.
-
-## Directory Mode Index Template
+### Directory mode — master index (`feature-routes/index.md`)
 
 ```md
 # Feature Route Index
 
-- {Module name}: `{module-file}.md`
-  - {Feature name}: `{feature-file}.md` (only when using feature-level files)
+- Type: ... | Main entry: `...` | Test entry: `...`
+
+- `{module}.md` — {one-line module summary} ({n} features)
+- `{module}.md` — {one-line module summary} ({n} features)
 ```
 
-The index should prioritize recording module-to-file mappings; when features are few, only modules can be listed; when features are numerous or cross-module confusion is likely, specific features can be listed.
+### Directory mode — per-module file (`feature-routes/{module}.md`)
+
+```md
+# {Module name}
+
+### {Feature name}
+- Description: ...
+- Entry: `...`
+- Core: `...`
+- Tests: `...`
+- {Extra}: `...`
+```
+
+## Completion Checklist
+
+Before returning to `worker-lookup`, confirm:
+
+- Route map created at the right location (single file or directory mode).
+- Project Overview filled (type, main entry, core dirs, test entry).
+- Every core module's features have entries; legacy modules skipped or lightly covered per user guidance.
+- Each entry has at least Description + Entry + Core; Tests present when non-obvious; extra fields only where relevant.
+- Unconfirmed locations marked `uncertain`; nothing fabricated.
+- (Directory mode) master `index.md` lists module → file + summary + feature count.
+- Hand off to `worker-lookup` with coverage `partial`.
+
+## Anti-Patterns
+
+| Excuse | Reality |
+|---|---|
+| "First-time setup should only cover the current task's feature" | A per-task map stays tiny and never helps the next task. First time = full inventory (user-guided) to build a reusable baseline. |
+| "Full inventory means documenting every file" | Scan broad to FIND every feature; RECORD only locate-essential info per feature. The map is a lookup, not an index. |
+| "I'll just scan everything, including legacy modules" | Ask the user which modules are core vs legacy first — dead code wastes effort and pollutes the map. |
+| "This feature is small, I'll skip it" | If it is a real capability someone might change, record it leanly. Skip only true non-features (typos, formatting). |
+| "I can't confirm the entry, so I'll guess" | Mark `uncertain` or omit. Fabricated locations send future tasks to the wrong file. |
+| "One big file is fine even for this project" | A huge single file forces the AI to read everything each lookup. Use directory mode + index for progressive disclosure. |
+| "Let me open every file to be thorough" | Enumerate with glob/grep, open only entry/core files per feature. Reading everything burns tokens for no extra map quality. |
