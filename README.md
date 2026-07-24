@@ -16,6 +16,25 @@ Supported harnesses: **OpenCode**, **Claude Code**, **Codex**. The same `skills/
 
 `using-workerhelper` · `worker-lookup` · `worker-init` · `worker-sync` · `worker-debug` · `design` · `plan` · `exec-plan`
 
+## Storage Layout
+
+WorkerHelper writes two kinds of artifacts under one directory in your project — `docs/workerhelper/` — forming a "location ↔ spec" loop.
+
+```
+docs/workerhelper/
+├── feature-routes.md          # Small project: single-file route map
+├── feature-routes/            # Large project: directory mode (progressive disclosure)
+│   ├── index.md               #   master index: module → file + summary
+│   └── <module>.md            #   one file per module
+└── yyyy-MM-dd-{taskName}/     # Per-task spec dir (design / plan / fix plans)
+    ├── design.md
+    ├── plan.md
+    └── plan-fix{n}.md
+```
+
+- **Feature route map** — the "what to read first" lookup for locating code. Small project → `feature-routes.md`; large / multi-module project → `feature-routes/` (master `index.md` + per-module files, so the AI reads only the module it needs, saving tokens).
+- **Task spec dir** — `yyyy-MM-dd-{taskName}/` holds that task's `design.md`, `plan.md`, and any `plan-fix{n}.md`.
+
 ## Install
 
 Pick your harness — the same `skills/` run on all three; only the bootstrap differs.

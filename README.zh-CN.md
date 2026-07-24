@@ -16,6 +16,25 @@
 
 `using-workerhelper` · `worker-lookup` · `worker-init` · `worker-sync` · `worker-debug` · `design` · `plan` · `exec-plan`
 
+## 存储结构
+
+WorkerHelper 在你项目中的 `docs/workerhelper/` 目录下写入两类产物,共同构成"位置 ↔ 规约"闭环。
+
+```
+docs/workerhelper/
+├── feature-routes.md          # 小项目:单文件路由表
+├── feature-routes/            # 大项目:目录模式(渐进式披露)
+│   ├── index.md               #   总索引:模块 → 文件 + 摘要
+│   └── <module>.md            #   每模块一个文件
+└── yyyy-MM-dd-{taskName}/     # 任务规约目录(design / plan / 修复计划)
+    ├── design.md
+    ├── plan.md
+    └── plan-fix{n}.md
+```
+
+- **功能路由表** —— "下次改某个功能先读哪些文件"的速查表。小项目用 `feature-routes.md`;大 / 多模块项目用 `feature-routes/`(总索引 `index.md` + 每模块文件,AI 只读它需要的那个模块,省 token)。
+- **任务规约目录** —— `yyyy-MM-dd-{taskName}/` 存放该任务的 `design.md`、`plan.md`,以及修复追加的 `plan-fix{n}.md`。
+
 ## 安装
 
 选择你的 harness —— 同一套 `skills/` 在三者上运行;只是引导方式不同。
