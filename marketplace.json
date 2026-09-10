@@ -1,0 +1,20 @@
+{
+  "name": "workerhelper-marketplace",
+  "interface": {
+    "displayName": "WorkerHelper"
+  },
+  "plugins": [
+    {
+      "name": "workerhelper",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

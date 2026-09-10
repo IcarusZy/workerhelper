@@ -64,7 +64,9 @@ Details: [`.opencode/INSTALL.md`](.opencode/INSTALL.md).
 
 ### Codex
 
-Install via Codex's plugin flow — point Codex at this repo as a marketplace source, then in the Codex CLI run `/plugins`, search `workerhelper`, and install. The `.codex-plugin/plugin.json` declares the skills; Codex discovers them natively (no session hook). Installed plugins are cached under `~/.codex/plugins/cache/`.
+**Codex has no SessionStart hook** — skill bodies are never auto-injected at session start. Instead, Codex injects every installed skill's `name` + `description` into each new session and loads the body on demand. WorkerHelper fits this model: the `worker-lookup` description itself carries the mandatory-first rule, so any coding task in a clean session should trigger it before code is written.
+
+Install via the Codex app's plugin/marketplace flow: add this repo (local path or GitHub URL — the repo root ships a Codex-format `marketplace.json`) as a marketplace, then install `workerhelper`. Skills take effect when a **new** session starts; installed plugins are cached under `~/.codex/plugins/cache/`.
 
 For `exec-plan` sub-agents, enable multi-agent in `~/.codex/config.toml`:
 
@@ -77,7 +79,7 @@ See [`skills/using-workerhelper/references/codex-tools.md`](skills/using-workerh
 
 ## Verify
 
-In a clean session, send any coding task. `using-workerhelper` should load before any code is written and direct you to `worker-lookup` first.
+In a clean session, send any coding task. On Claude Code / OpenCode, the injected `using-workerhelper` guide loads first and directs you to `worker-lookup`. On Codex, `worker-lookup` itself should load before any code is written (its description carries the routing rule).
 
 ## License
 

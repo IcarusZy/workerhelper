@@ -64,7 +64,9 @@ SessionStart 钩子会在每次会话启动时自动注入 `using-workerhelper`(
 
 ### Codex
 
-通过 Codex 的插件流程安装 —— 将本仓库作为市场源指向 Codex,然后在 Codex CLI 中运行 `/plugins`,搜索 `workerhelper` 并安装。`.codex-plugin/plugin.json` 声明技能;Codex 原生发现它们(无会话钩子)。已安装插件缓存在 `~/.codex/plugins/cache/`。
+**Codex 没有 SessionStart 钩子** —— 不会在会话启动时自动注入技能正文。它的机制是:把所有已安装技能的 `name` + `description` 注入每个新会话,正文按需加载。WorkerHelper 按此模型适配:`worker-lookup` 的 description 本身携带"所有编码任务必须先加载它"的强制规则,因此干净会话中的任何编码任务都应先触发它。
+
+安装:在 Codex 应用的插件/市场流程中添加本仓库为市场源(本地路径或 GitHub URL —— 仓库根已提供 Codex 格式的 `marketplace.json`),然后安装 `workerhelper`。技能在**新会话启动时**生效;已安装插件缓存在 `~/.codex/plugins/cache/`。
 
 要让 `exec-plan` 的子代理(sub-agent)工作,在 `~/.codex/config.toml` 中启用多代理:
 
@@ -77,7 +79,7 @@ multi_agent = true
 
 ## 验证
 
-在干净会话中发送任意编码任务。`using-workerhelper` 应在任何代码编写之前加载,并指引你先走 `worker-lookup`。
+在干净会话中发送任意编码任务。Claude Code / OpenCode 上会注入 `using-workerhelper` 引导并先走 `worker-lookup`;Codex 上则应直接加载 `worker-lookup`(其 description 携带强制路由规则)。
 
 ## 许可证
 
