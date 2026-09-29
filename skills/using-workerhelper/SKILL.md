@@ -11,6 +11,10 @@ WorkerHelper is a suite of AI coding workflow skills that quickly locate code th
 
 **All coding tasks must load `worker-lookup` first, then follow its guidance for subsequent steps.**
 
+## Language
+
+Ask questions, present findings, and write artifact descriptions (route map, design, glossary, env map) in the **user's conversation language** — a Chinese-speaking user gets Chinese throughout. Skill names and field names (Entry / Core / Tests) stay English; artifact body text follows the user's language.
+
 ## Workflow Overview
 
 1. **worker-lookup** — Query the feature route map to locate relevant code (mandatory entry point for all coding tasks)

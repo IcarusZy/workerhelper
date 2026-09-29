@@ -30,10 +30,11 @@ In directory mode:
 
 ## Workflow
 
-0. **Three-way branch BEFORE inventorying.** This skill is entered when no route map exists; first decide what the directory holds:
-   - **Existing project** (source files / config manifests present) → continue with the inventory workflow below.
-   - **Empty or new** (directory empty, or only README / `.git` / license files) → ask once: "Empty directory detected — starting a new project?" On confirmation, load `worker-greenfield` and stop this skill.
+0. **Three-way branch BEFORE inventorying.** This skill is entered when no route map exists; first decide what the CURRENT directory holds. Judge ONLY by top-level entries of the cwd — well-known manifests (`package.json`, `pom.xml`, `build.gradle`, `pyproject.toml`, `requirements.txt`, `go.mod`, `Cargo.toml`, `*.csproj`) or source directories with real code (`src/`, `app/`, `lib/`). **Never recurse into other folders, and never scan parent or sibling directories hunting for "the real project"** — the route map belongs to this directory or nowhere.
+   - **Existing project** (project signals at the top level) → continue with the inventory workflow below.
+   - **No project signals** (directory empty; only README / `.git` / license; or top level holds just non-project files) → ask once, in the user's language: "This directory holds no project — starting a new one here?" On confirmation, load `worker-greenfield` and stop this skill.
    - **Stated intent** (the session expresses new-project intent: "新建项目 / 从零 / new project / scaffold") → load `worker-greenfield` and stop this skill.
+   - If the cwd is obviously not a workspace (a user home directory, a system path — recognizable from entries like `NTUSER.DAT`, `AppData`, `Desktop`), say so and ask whether to create the project here or in a subdirectory. Never inventory such a directory, and never go looking elsewhere for a project.
 
    When in doubt, ask — never scaffold on a guess.
 1. Confirm the route map does not exist: check `docs/workerhelper/feature-routes.md` and `docs/workerhelper/feature-routes/`.

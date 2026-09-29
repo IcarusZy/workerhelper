@@ -10,6 +10,7 @@ From-zero project bootstrap: clarify what to build, decide architecture and stac
 ## Core Principles
 
 - **Ask before generating.** An empty directory is the cheapest moment to be wrong. Never scaffold before Phase 0 and the five-section agenda are settled with the user.
+- **Speak the user's language.** The entire interview, agenda, and all artifacts run in the user's conversation language; record glossary terms in that language with the English form alongside when they differ.
 - **Facts are yours, decisions are the user's.** Ecosystem viability, tool maturity, and feasibility checks are agent work — research them, don't ask. What to build, which stack, and MVP boundaries are the user's calls, always presented with your recommendation.
 - **Ground the vocabulary from day one.** Terms that emerge during clarification go straight into the glossary; file, module, and variable naming then derives from that shared language.
 - **The scaffold must run.** Done means: dependencies install, the entry point starts, the smoke check passes. A scaffold that cannot start is noise, not progress.

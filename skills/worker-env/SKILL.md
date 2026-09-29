@@ -9,7 +9,7 @@ Discover connection info in project config files, wire matching MCP tools into t
 
 ## Core Principles
 
-- **Ask before wiring.** Every MCP configuration is proposed, then confirmed. Nothing is installed or written silently.
+- **Ask before wiring.** Every MCP configuration is proposed, then confirmed. Nothing is installed or written silently. Proposals and confirmations run in the user's conversation language.
 - **Credentials never multiply.** Passwords are referenced from environment variables, never copied into new files. Source config files (`.env`, `application.yml`) are read locally and never quoted into any artifact — mask credentials when showing what was found.
 - **One registry, two layers.** Built-in defaults ship with the skill; the user layer (`~/.workerhelper/mcp-registry.md`) replaces entries wholesale, so any default tool can be swapped for a preferred one.
 - **npx-first acquisition.** Prefer servers that run via npx/uvx — writing the config IS the installation. `npm -g` is the fallback; binary downloads are out of scope.
