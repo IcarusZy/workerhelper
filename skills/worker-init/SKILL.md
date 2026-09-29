@@ -1,6 +1,6 @@
 ---
 name: worker-init
-description: Create the feature route map for the first time and write initial entries. Only triggered when the route map does not exist and the current task requires code location.
+description: Create the feature route map for the first time and write initial entries. Only triggered when the route map does not exist and the current task requires code location. Routes to worker-greenfield instead when the directory holds no project or the user intends a new one.
 ---
 
 # Route Init
@@ -30,6 +30,12 @@ In directory mode:
 
 ## Workflow
 
+0. **Three-way branch BEFORE inventorying.** This skill is entered when no route map exists; first decide what the directory holds:
+   - **Existing project** (source files / config manifests present) → continue with the inventory workflow below.
+   - **Empty or new** (directory empty, or only README / `.git` / license files) → ask once: "Empty directory detected — starting a new project?" On confirmation, load `worker-greenfield` and stop this skill.
+   - **Stated intent** (the session expresses new-project intent: "新建项目 / 从零 / new project / scaffold") → load `worker-greenfield` and stop this skill.
+
+   When in doubt, ask — never scaffold on a guess.
 1. Confirm the route map does not exist: check `docs/workerhelper/feature-routes.md` and `docs/workerhelper/feature-routes/`.
 2. Full-project scan to identify modules and features. Follow **Scan Priority** below — do not open every file.
 3. Ask the user ONE consolidated question: which modules are CORE (inventory deeply) vs LEGACY/ABANDONED (skip or cover lightly). Proceed even if the user has no preference.
@@ -38,6 +44,7 @@ In directory mode:
 6. Write feature entries — grouped by module, or flat under a `## Features` heading for small projects. For each feature record Description + Entry + Core (+ Tests when non-obvious; + feature-specific extra location fields only when they affect locating). See **Feature Entry Fields**.
 7. Mark unconfirmed locations `uncertain`; never fabricate.
 8. Return to `worker-lookup` and set coverage to `partial` (the map now exists; worker-lookup refines per task).
+9. Optional glossary: if `docs/workerhelper/glossary.md` does not exist, offer ONCE to extract a seed glossary from the domain terms observed during the scan (format defined in `worker-greenfield`). If declined or the project has no evident domain vocabulary, skip silently. Optionally offer the `worker-env` mount (environment discovery / MCP wiring) once here.
 
 ## Scan Priority
 

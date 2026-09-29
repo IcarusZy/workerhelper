@@ -13,3 +13,13 @@ Vincent / Prime Radiant.
 
 - License: MIT
 - Source: https://github.com/obra/superpowers
+
+## mattpocock/skills
+
+The grilling-style interview protocol in `skills/worker-greenfield/SKILL.md`
+(design tree, frontier, rounds with recommended answers, facts-vs-decisions
+split) is adapted from the `grilling` skill in
+[mattpocock/skills](https://github.com/mattpocock/skills) by Matt Pocock.
+
+- License: MIT
+- Source: https://github.com/mattpocock/skills

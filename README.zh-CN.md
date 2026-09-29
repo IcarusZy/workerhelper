@@ -10,15 +10,17 @@
 
 - **先定位**:每个编码任务都先加载 `worker-lookup`,查询功能路由表并路由到正确的下一步。
 - **按任务规模分流**:小改动 → 直接 `exec-plan`;中 / 大 / 范围不清晰 → `design` → `plan` → `exec-plan`;缺陷 → `worker-debug`。
-- **规格驱动**:路由表与每个任务的设计 / 计划文档位于 `docs/workerhelper/`。
+- **绿地建项目**:空目录或明确的新建意图 → `worker-greenfield`(grilling 式需求澄清、五节架构议程、脚手架落地、占位路由表)。
+- **环境自动接线**:`worker-env` 从 `.env` / `application.yml` 发现连接信息,经两层注册表(`~/.workerhelper/` 覆盖内置默认)配置 MCP 工具并验证,产出环境地图供 `worker-debug` 远程日志探针使用。
+- **规格驱动**:路由表、词汇表、ADR 与每个任务的设计 / 计划文档位于 `docs/workerhelper/`。
 
 ## 技能
 
-`using-workerhelper` · `worker-lookup` · `worker-init` · `worker-sync` · `worker-debug` · `design` · `plan` · `exec-plan`
+`using-workerhelper` · `worker-lookup` · `worker-init` · `worker-greenfield` · `worker-env` · `worker-sync` · `worker-debug` · `design` · `plan` · `exec-plan`
 
 ## 存储结构
 
-WorkerHelper 在你项目中的 `docs/workerhelper/` 目录下写入两类产物,共同构成"位置 ↔ 规约"闭环。
+WorkerHelper 在你项目中的 `docs/workerhelper/` 目录下写入产物,共同构成"位置 ↔ 规约"闭环。
 
 ```
 docs/workerhelper/
@@ -26,6 +28,9 @@ docs/workerhelper/
 ├── feature-routes/            # 大项目:目录模式(渐进式披露)
 │   ├── index.md               #   总索引:模块 → 文件 + 摘要
 │   └── <module>.md            #   每模块一个文件
+├── glossary.md                # 共享语言:术语 + 避免词 + 已消解的歧义
+├── env.md                     # 环境地图:服务器、日志路径、已配置的 MCP
+├── adr/                       # 架构决策记录(绿地与设计流程产生)
 └── yyyy-MM-dd-{taskName}/     # 任务规约目录(design / plan / 修复计划)
     ├── design.md
     ├── plan.md

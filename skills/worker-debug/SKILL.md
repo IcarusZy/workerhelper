@@ -26,7 +26,15 @@ Systematic debugging that leverages worker-lookup results to trace bugs to their
    - Is it a regression (was it working before)?
    - What inputs, states, or environments reproduce it?
    - What is the blast radius (affected features, modules, data)?
-4. If unable to reproduce: halt this phase — gather more information from the user, recent changes, logs, or error traces. Do not proceed without reproduction.
+4. If unable to reproduce: halt this phase — gather more information from the user, recent changes, logs, or error traces. Do not proceed without reproduction. For server-side evidence, use the **Remote Log Probe** below.
+
+### Remote Log Probe (when server-side signals are needed)
+
+When reproduction or tracing needs evidence from a test server's logs:
+
+1. Read `docs/workerhelper/env.md` (the environment map). Missing server or log-path info → ask the user then and there; optionally load `worker-env` to discover and record it for next time.
+2. Through the configured SSH MCP (see `worker-env`'s registry), run read-only probes against the recorded server: `tail -n 200 <log>`, `grep` by keyword, time-window filters between timestamps. Prefer `runCommandBatch` for multi-step probes.
+3. Treat log output as Phase 2/3 evidence — correlate timestamps of server-side events with the local divergence point. Read-only only: never modify server state from a probe.
 
 ### Phase 2: Trace the Data Flow
 

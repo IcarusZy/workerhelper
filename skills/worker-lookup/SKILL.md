@@ -18,7 +18,7 @@ Query the feature route map based on the user's current task to quickly identify
 
 ## Workflow
 
-1. Read the feature route map: `docs/workerhelper/feature-routes.md` or `docs/workerhelper/feature-routes/`.
+1. Read the feature route map: `docs/workerhelper/feature-routes.md` or `docs/workerhelper/feature-routes/`. If `docs/workerhelper/glossary.md` exists, read it first — domain vocabulary sharpens feature-name matching.
    - In directory mode, first read the feature index in `docs/workerhelper/feature-routes/README.md` or `docs/workerhelper/feature-routes/index.md`, then read the specific matched route files.
    - In directory mode, only when the index is missing, has no match, or appears outdated should you read potentially relevant feature files in the directory; if still unable to confirm, proceed with targeted scanning.
 2. In single-file mode, first read the `Module Index`, then locate related modules based on the feature, module, entry, or file mentioned by the user; then match feature location entries within the module.
@@ -28,7 +28,7 @@ Query the feature route map based on the user's current task to quickly identify
    - `sufficient`: Can locate main entries and core code; test locations are recorded if they exist.
    - `partial`: Can locate some information, but key location information is missing or appears outdated.
    - `missing`: Feature route map exists but has no related entries.
-6. If the feature route map does not exist and the current task requires code location, the `worker-init` skill must be loaded first to complete initial setup; after initialization, return to this skill to continue lookup, marking coverage status as `partial`.
+6. If the feature route map does not exist and the current task requires code location, the `worker-init` skill must be loaded first — it branches between inventorying an existing project and bootstrapping a new one (`worker-greenfield`); after initialization, return to this skill to continue lookup, marking coverage status as `partial`.
 7. Only perform targeted scanning when coverage is `partial` or `missing`, prioritizing source code, entry points, configuration, and test directories; exclude dependencies, build artifacts, caches, and generated code.
 8. Determine task intent and task type:
    - Analysis task: The user is only asking about code questions, risks, implementation logic, review feedback, or diagnostics. After lookup, read priority files and answer directly; do not load `design` or `exec-plan`.

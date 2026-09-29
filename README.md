@@ -10,15 +10,17 @@ Supported harnesses: **OpenCode**, **Claude Code**, **Codex**. The same `skills/
 
 - **Locate first**: every coding task loads `worker-lookup`, which queries the feature route map and routes to the right next step.
 - **Scale by task size**: small edits → `exec-plan` directly; medium/large/unclear → `design` → `plan` → `exec-plan`; bugs → `worker-debug`.
-- **Spec-driven**: the route map and per-task design/plan docs live under `docs/workerhelper/`.
+- **Greenfield included**: empty directory or new-project intent → `worker-greenfield` (grilling-style clarification, architecture agenda, scaffold, placeholder route map).
+- **Env wiring**: `worker-env` discovers connections in `.env` / `application.yml`, configures MCP tools via a two-layer registry (`~/.workerhelper/` overrides built-ins), verifies, and records an environment map for `worker-debug`'s remote log probe.
+- **Spec-driven**: the route map, glossary, ADRs, and per-task design/plan docs live under `docs/workerhelper/`.
 
 ## Skills
 
-`using-workerhelper` · `worker-lookup` · `worker-init` · `worker-sync` · `worker-debug` · `design` · `plan` · `exec-plan`
+`using-workerhelper` · `worker-lookup` · `worker-init` · `worker-greenfield` · `worker-env` · `worker-sync` · `worker-debug` · `design` · `plan` · `exec-plan`
 
 ## Storage Layout
 
-WorkerHelper writes two kinds of artifacts under one directory in your project — `docs/workerhelper/` — forming a "location ↔ spec" loop.
+WorkerHelper writes its artifacts under one directory in your project — `docs/workerhelper/` — forming a "location ↔ spec" loop.
 
 ```
 docs/workerhelper/
@@ -26,6 +28,9 @@ docs/workerhelper/
 ├── feature-routes/            # Large project: directory mode (progressive disclosure)
 │   ├── index.md               #   master index: module → file + summary
 │   └── <module>.md            #   one file per module
+├── glossary.md                # Shared language: terms + avoid-lists + resolved ambiguities
+├── env.md                     # Environment map: servers, log paths, configured MCPs
+├── adr/                       # Architecture decision records (greenfield & designs)
 └── yyyy-MM-dd-{taskName}/     # Per-task spec dir (design / plan / fix plans)
     ├── design.md
     ├── plan.md
