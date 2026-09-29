@@ -17,8 +17,9 @@ Vincent / Prime Radiant.
 ## mattpocock/skills
 
 The grilling-style interview protocol in `skills/worker-greenfield/SKILL.md`
+(Phase 0) and the Grilling Protocol section of `skills/design/SKILL.md`
 (design tree, frontier, rounds with recommended answers, facts-vs-decisions
-split) is adapted from the `grilling` skill in
+split) are adapted from the `grilling` skill in
 [mattpocock/skills](https://github.com/mattpocock/skills) by Matt Pocock.
 
 - License: MIT
