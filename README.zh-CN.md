@@ -59,11 +59,13 @@ SessionStart 钩子会在每次会话启动时自动注入 `using-workerhelper`(
 
 ### OpenCode
 
-添加到 `opencode.json`(全局或项目级),然后重启 OpenCode:
+需要 OpenCode **v2+**(插件为 V2 原生实现:`Plugin.define` + `setup(ctx)`)。添加到 `opencode.json(c)`(全局或项目级),然后重启 OpenCode:
 
 ```json
-{ "plugin": ["workerhelper@git+https://github.com/IcarusZy/workerhelper.git"] }
+{ "plugins": ["workerhelper@git+https://github.com/IcarusZy/workerhelper.git"] }
 ```
+
+或通过 CLI:`opencode plugin add git+https://github.com/IcarusZy/workerhelper.git`。插件通过 V2 技能注册表注册全部技能,并把工作流引导注入系统上下文。
 
 详见 [`.opencode/INSTALL.md`](.opencode/INSTALL.md)。
 

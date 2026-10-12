@@ -59,11 +59,13 @@ For local development, you can instead `/plugin install /absolute/path/to/worker
 
 ### OpenCode
 
-Add to `opencode.json` (global or project-level), then restart OpenCode:
+Requires OpenCode **v2+** (the plugin is V2-native: `Plugin.define` + `setup(ctx)`). Add to `opencode.json(c)` (global or project-level), then restart OpenCode:
 
 ```json
-{ "plugin": ["workerhelper@git+https://github.com/IcarusZy/workerhelper.git"] }
+{ "plugins": ["workerhelper@git+https://github.com/IcarusZy/workerhelper.git"] }
 ```
+
+Or via CLI: `opencode plugin add git+https://github.com/IcarusZy/workerhelper.git`. The plugin registers every skill through the V2 skill registry and injects the workflow bootstrap into the system context.
 
 Details: [`.opencode/INSTALL.md`](.opencode/INSTALL.md).
 

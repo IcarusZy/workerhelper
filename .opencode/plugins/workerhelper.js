@@ -1,80 +1,84 @@
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 import { fileURLToPath } from 'url';
+import { Plugin } from '@opencode/plugin';
+
+// OpenCode V2 plugin (Plugin.define + setup(ctx)).
+// V1 of this file returned a hooks object with `config` and
+// `experimental.chat.messages.transform`; V2 does not run that shape.
+// Migration reference: https://opencode.ai/v2/docs/build/plugins/migrate-v1
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, '../..');
-const cacheParent = path.resolve(pkgRoot, '../..');
-const markerPath = path.join(cacheParent, '.workerhelper-version');
+const skillsDir = path.join(pkgRoot, 'skills');
 
-const REPO_COMMITS_API = 'https://api.github.com/repos/IcarusZy/workerhelper/commits/main';
-const UPDATE_CHECK_INTERVAL = 24 * 60 * 60 * 1000;
-
-const extractBody = (content) => {
-  const match = content.match(/^---\n[\s\S]*?\n---\n([\s\S]*)$/);
-  return match ? match[1] : content;
+const parseFrontmatter = (content) => {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+  if (!match) return {};
+  const meta = {};
+  for (const line of match[1].split(/\r?\n/)) {
+    const kv = line.match(/^([a-zA-Z_-]+):\s*(.*)$/);
+    if (kv && !(kv[1] in meta)) meta[kv[1]] = kv[2].trim();
+  }
+  return meta;
 };
 
-let _bootstrapCache = undefined;
+const listSkills = () => {
+  if (!fs.existsSync(skillsDir)) return [];
+  return fs
+    .readdirSync(skillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => {
+      const skillPath = path.join(skillsDir, e.name, 'SKILL.md');
+      if (!fs.existsSync(skillPath)) return null;
+      const content = fs.readFileSync(skillPath, 'utf8');
+      const meta = parseFrontmatter(content);
+      return {
+        id: e.name,
+        name: meta.name || e.name,
+        description: meta.description || '',
+        path: skillPath,
+        content,
+      };
+    })
+    .filter(Boolean);
+};
 
 const loadBootstrap = () => {
-  if (_bootstrapCache !== undefined) return;
-  const skillPath = path.join(pkgRoot, 'skills', 'using-workerhelper', 'SKILL.md');
-  if (!fs.existsSync(skillPath)) { _bootstrapCache = null; return; }
+  const skillPath = path.join(skillsDir, 'using-workerhelper', 'SKILL.md');
+  if (!fs.existsSync(skillPath)) return null;
   const content = fs.readFileSync(skillPath, 'utf8');
-  _bootstrapCache = `<WORKERHELPER_IMPORTANT>
+  const body = content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '');
+  return `<WORKERHELPER_IMPORTANT>
 WorkerHelper workflow has been loaded.
 
 **IMPORTANT: The content below has been loaded. Do NOT use the skill tool to load "using-workerhelper" again.**
 
-${extractBody(content)}
+${body}
 </WORKERHELPER_IMPORTANT>`;
 };
 
-loadBootstrap();
-
-(async () => {
-  try {
-    let marker = {};
-    try { marker = JSON.parse(fs.readFileSync(markerPath, 'utf8')); } catch {}
-    if (marker.checked && Date.now() - marker.checked < UPDATE_CHECK_INTERVAL) return;
-
-    const res = await fetch(REPO_COMMITS_API, {
-      headers: { 'Accept': 'application/vnd.github+json', 'User-Agent': 'workerhelper-plugin' },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!res.ok) return;
-    const { sha } = await res.json();
-    const prevSha = marker.commit;
-    fs.writeFileSync(markerPath, JSON.stringify({ checked: Date.now(), commit: sha }));
-
-    if (prevSha && prevSha !== sha) {
-      try { fs.rmSync(pkgRoot, { recursive: true, force: true }); } catch {}
-      try { fs.rmSync(path.join(cacheParent, 'package-lock.json'), { force: true }); } catch {}
+export default Plugin.define({
+  id: 'workerhelper',
+  async setup(ctx) {
+    // Register every bundled skill with the skill registry.
+    const skills = listSkills();
+    if (skills.length > 0) {
+      await ctx.skill.transform((editor) => {
+        for (const skill of skills) editor.add(skill);
+      });
     }
-  } catch {}
-})();
 
-export const WorkerHelperPlugin = async () => {
-  const skillsDir = path.join(pkgRoot, 'skills');
-
-  return {
-    config: async (config) => {
-      config.skills = config.skills || {};
-      config.skills.paths = config.skills.paths || [];
-      if (!config.skills.paths.includes(skillsDir)) {
-        config.skills.paths.push(skillsDir);
-      }
-    },
-
-    'experimental.chat.messages.transform': async (_input, output) => {
-      const bootstrap = _bootstrapCache;
-      if (!bootstrap || !output.messages.length) return;
-      const firstUser = output.messages.find(m => m.info.role === 'user');
-      if (!firstUser || !firstUser.parts.length) return;
-      if (firstUser.parts.some(p => p.type === 'text' && p.text.includes('WORKERHELPER_IMPORTANT'))) return;
-      const ref = firstUser.parts[0];
-      firstUser.parts.unshift({ ...ref, type: 'text', text: bootstrap });
-    },
-  };
-};
+    // Inject the workflow bootstrap into each model request's system context.
+    // The per-request event is fresh, so this cannot accumulate; the guard
+    // covers transformed/replayed requests that already carry the marker.
+    const bootstrap = loadBootstrap();
+    if (bootstrap) {
+      await ctx.session.hook('context', (event) => {
+        if (!event.system) return;
+        if (event.system.some((part) => part?.text?.includes('WORKERHELPER_IMPORTANT'))) return;
+        event.system.push({ type: 'text', text: bootstrap });
+      });
+    }
+  },
+});

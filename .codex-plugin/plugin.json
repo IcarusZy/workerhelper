@@ -1,6 +1,6 @@
 {
   "name": "workerhelper",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "WorkerHelper: doc-driven AI coding workflow suite. Mandatory routing rule: for ANY coding task (add/modify/fix/refactor a feature, code question, bug, test failure, crash, regression), load the worker-lookup skill FIRST to locate code via the feature route map, then follow its routing (small change -> exec-plan; medium/large/unclear -> design -> plan -> exec-plan; bugs -> worker-debug). Run worker-sync after feature changes.",
   "author": {
     "name": "IcarusZy",
